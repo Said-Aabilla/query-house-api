@@ -1,6 +1,6 @@
 from django.db import models
 
-from query_app.models_base import BaseModel
+from app.models_base import BaseModel
 
 
 class Query(BaseModel):
