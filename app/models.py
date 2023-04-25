@@ -4,7 +4,7 @@ from app.models_base import BaseModel
 
 
 class Query(BaseModel):
-    query = models.CharField(max_length=500)
+    query = models.TextField()
     join_order = models.CharField(max_length=250, null=True)
     execution_time = models.FloatField(null=True)
     estimated_execution_time = models.FloatField(null=True)
@@ -29,7 +29,7 @@ class Attribute(BaseModel):
 class Selection(models.Model):
     selection = models.CharField(max_length=255)
     queries = models.ManyToManyField(Query)
-    algorithm = models.ForeignKey('SelectionAlgorithm', on_delete=models.CASCADE, related_name='selections')
+    algorithm = models.ForeignKey('SelectionAlgorithm', on_delete=models.CASCADE, related_name='selections', null=True)
     operators = models.ManyToManyField('Operator', through='SelectionOperator')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='selections')
 
@@ -63,17 +63,17 @@ class Projection(models.Model):
     all = models.BooleanField(null=True)
     queries = models.ManyToManyField(Query)
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='projections')
+    aggregation = models.ForeignKey('Aggregation', on_delete=models.CASCADE, related_name='projections')
 
 
 class Aggregation(models.Model):
     function = models.CharField(max_length=255, unique=True)
-    projection = models.ForeignKey(Projection, on_delete=models.CASCADE, related_name='aggregations')
 
 
 class Join(models.Model):
     join = models.CharField(max_length=255)
-    index = models.ForeignKey('JoinIndex', on_delete=models.CASCADE, related_name='joins')
-    algorithm = models.ForeignKey('JoinAlgorithm', on_delete=models.CASCADE, related_name='joins')
+    index = models.ForeignKey('JoinIndex', on_delete=models.CASCADE, related_name='joins', null=True)
+    algorithm = models.ForeignKey('JoinAlgorithm', on_delete=models.CASCADE, related_name='joins', null=True)
     queries = models.ManyToManyField(Query)
 
 

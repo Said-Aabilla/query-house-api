@@ -27,20 +27,30 @@ class OperatorSerializer(serializers.ModelSerializer):
 class SelectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Selection
-        fields = ['id', 'selection', 'queries', 'algorithm', 'operators', 'attribute']
+        fields = ['id', 'selection', 'algorithm', 'operators', 'attribute']
 
 
 class ProjectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projection
-        fields = ['id', 'projection', 'all', 'queries', 'attribute']
+        fields = ['id', 'projection', 'all',  'attribute','aggregation']
 
 
 class JoinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Join
-        fields = ['id', 'join', 'index', 'algorithm', 'queries']
+        fields = ['id', 'join', 'index', 'algorithm']
 
+
+class CreateQuerySerializer(serializers.ModelSerializer):
+    tables = TableSerializer(many=True, read_only=True)
+    selections = SelectionSerializer(many=True, read_only=True)
+    projections = ProjectionSerializer(many=True, read_only=True)
+    joins = JoinSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Query
+        fields = ['query', 'tables', 'selections', 'projections', 'joins']
 
 class QuerySerializer(serializers.ModelSerializer):
     tables = TableSerializer(many=True, read_only=True)

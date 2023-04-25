@@ -1,3 +1,7 @@
+import json
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 from django.shortcuts import render
 
 # Create your views here.
@@ -5,36 +9,50 @@ from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 
 from .models import Query, Table, SelectionAlgorithm, Attribute, Selection, Operator, Value, SelectionOperator, \
-    Projection, Aggregation, JoinIndex, Join, JoinAttribute, JoinAlgorithm,Domain
-from .serializers import QuerySerializer, ProjectionSerializer, AttributeSerializer, TableSerializer, \
-    OperatorSerializer, ValueSerializer, DomainSerializer
+    Projection, Aggregation, JoinIndex, Join, JoinAttribute, JoinAlgorithm, Domain
+from .serializers import ProjectionSerializer, AttributeSerializer, TableSerializer, \
+    OperatorSerializer, ValueSerializer, DomainSerializer, CreateQuerySerializer, QuerySerializer
 
 
 class DomainCreateAPIView(generics.CreateAPIView):
     queryset = Domain.objects.all()
     serializer_class = DomainSerializer
+
+
 class DomainRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Domain.objects.all()
     serializer_class = DomainSerializer
+
+
 class ValueCreateAPIView(generics.CreateAPIView):
     queryset = Value.objects.all()
     serializer_class = ValueSerializer
+
+
 class ValueRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Value.objects.all()
     serializer_class = ValueSerializer
 
+
 class TableCreateAPIView(generics.CreateAPIView):
     queryset = Table.objects.all()
     serializer_class = TableSerializer
+
+
 class TableRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Table.objects.all()
     serializer_class = TableSerializer
+
+
 class OperatorCreateAPIView(generics.CreateAPIView):
     queryset = Operator.objects.all()
     serializer_class = OperatorSerializer
+
+
 class OperatorRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Operator.objects.all()
     serializer_class = OperatorSerializer
+
 
 class AttributeCreateAPIView(generics.CreateAPIView):
     queryset = Attribute.objects.all()
@@ -58,7 +76,7 @@ class ProjectionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
 
 class QueryViewSet(viewsets.ModelViewSet):
     queryset = Query.objects.all()
-    serializer_class = QuerySerializer
+    serializer_class = CreateQuerySerializer
 
     def search(self, request):
         keyword = request.GET.get('keyword')
@@ -67,65 +85,54 @@ class QueryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        table_data = request.data.pop('tables')
-        selections_data = request.data.pop('selections')
-        projections_data = request.data.pop('projections')
-        joins_data = request.data.pop('joins')
-        # create Query object
-        query = Query.objects.create(**request.data)
 
-        # create Table objects and add to Query
-        tables = []
-        for table in table_data:
-            tables.append(Table.objects.create(**table))
-        query.tables.set(tables)
+        data = json.loads(request.body)
+        query_str = data.get('query')
+        table_ids = data.get('table', [])
+        selection_info = data.get('selection', [])
+        projection_info = data.get('projection', [])
+        join_info = data.get('join', [])
 
-        # create Selection objects and add to Query
-        selections = []
-        for selection in selections_data:
-            algorithm_data = selection.pop('algorithm')
-            operators_data = selection.pop('operators')
-            attribute_data = selection.pop('attribute')
-            algorithm = SelectionAlgorithm.objects.create(**algorithm_data)
-            attribute = Attribute.objects.create(**attribute_data)
-            selection_obj = Selection.objects.create(query=query, algorithm=algorithm, attribute=attribute, **selection)
-            operators = []
-            for operator_data in operators_data:
-                value_data = operator_data.pop('value')
-                operator = Operator.objects.create(**operator_data)
-                value = Value.objects.create(**value_data)
-                operators.append(
-                    SelectionOperator.objects.create(selection=selection_obj, operator=operator, value=value))
-            selections.append(selection_obj)
-        query.selections.set(selections)
+        # Create the Query object
+        query = Query.objects.create(query=query_str)
 
-        # create Projection objects and add to Query
-        projections = []
-        for projection in projections_data:
-            attribute_data = projection.pop('attribute')
-            attribute = Attribute.objects.create(**attribute_data)
-            projection_obj = Projection.objects.create(query=query, attribute=attribute, **projection)
-            aggregations_data = projection.pop('aggregations')
-            for aggregation_data in aggregations_data:
-                Aggregation.objects.create(projection=projection_obj, **aggregation_data)
-            projections.append(projection_obj)
-        query.projections.set(projections)
+        # Add the tables to the query
+        for table_id in table_ids:
+            table = Table.objects.get(id=table_id)
+            query.tables.add(table)
 
-        # create Join objects and add to Query
-        joins = []
-        for join in joins_data:
-            index_data = join.pop('index')
-            algorithm_data = join.pop('algorithm')
-            index = JoinIndex.objects.create(**index_data)
-            algorithm = JoinAlgorithm.objects.create(**algorithm_data)
-            join_obj = Join.objects.create(query=query, index=index, algorithm=algorithm, **join)
-            join_attributes_data = join.pop('joinattributes')
-            for join_attribute_data in join_attributes_data:
-                attribute_data = join_attribute_data.pop('attribute')
-                attribute = Attribute.objects.create(**attribute_data)
-                JoinAttribute.objects.create(join=join_obj, attribute=attribute, **join_attribute_data)
-            joins.append(join_obj)
-        query.joins.set(joins)
+        # Add the selections to the query
+        for sel in selection_info:
+            selection = Selection.objects.create(selection=sel['selection'], attribute_id=sel['attribute_id'])
+            query.selections.add(selection)
+
+            # Add the operators and values to the selection
+            for op_info in sel['operators']:
+                operator = Operator.objects.get(name=op_info['operator'])
+                value = Value.objects.create(value=op_info['value'], domain_id=op_info['domain_id'])
+                selection.operators.add(operator, through_defaults={'value': value})
+
+        # Add the projections to the query
+        for proj in projection_info:
+            # Add the aggregation to the projection
+
+            aggregation = Aggregation.objects.get(function=proj['aggregation'])
+
+            projection = Projection.objects.create(projection=proj['projection'], alias=proj['alias'],
+                                                   all=proj['all'], attribute_id=proj['attribute_id'], aggregation=aggregation)
+
+        # Add the joins to the query
+        for join_info in join_info:
+            join = Join.objects.create(join=join_info['join'])
+
+            # Add the attributes to the join
+            for join_attr_info in join_info['join_attributes']:
+                attribute = Attribute.objects.get(id=join_attr_info['attribute_id'])
+                JoinAttribute.objects.create(join=join, attribute=attribute, position=join_attr_info['position'])
+
+            query.joins.add(join)
+
         serializer = QuerySerializer(query)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+        return Response(serializer.data)
+
