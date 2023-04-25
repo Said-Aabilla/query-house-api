@@ -1,7 +1,13 @@
-from django.urls import path
-from .views import QueryList, QueryDetail
+from django.urls import include, path
+from rest_framework import routers
+from app.views import QueryViewSet
+
+router = routers.DefaultRouter()
+router.register(r'queries', QueryViewSet)
 
 urlpatterns = [
-    path('queries/', QueryList.as_view(), name='query-list'),
-    path('queries/<int:pk>/', QueryDetail.as_view(), name='query-detail'),
+    path('', include(router.urls)),
+
+    path('queries/search/', QueryViewSet.as_view({'get': 'search'}), name='query_search'),
+
 ]

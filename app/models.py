@@ -82,7 +82,7 @@ class JoinAttribute(models.Model):
     position = models.CharField(max_length=20)
 
 
-class joinAlgorithm(models.Model):
+class JoinAlgorithm(models.Model):
     name = models.CharField(max_length=255)
 
 
