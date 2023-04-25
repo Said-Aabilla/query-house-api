@@ -5,7 +5,7 @@ from app.models_base import BaseModel
 
 class Query(BaseModel):
     query = models.CharField(max_length=500)
-    join_order = models.CharField(max_length=250)
+    join_order = models.CharField(max_length=250, null=True)
     execution_time = models.FloatField(null=True)
     estimated_execution_time = models.FloatField(null=True)
     execution_energy = models.FloatField(null=True)
@@ -16,13 +16,13 @@ class Query(BaseModel):
 
 
 class Table(BaseModel):
-    name = models.CharField(max_length=50)
-    alias = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
+    alias = models.CharField(max_length=50, unique=True)
     queries = models.ManyToManyField('Query')
 
 
 class Attribute(BaseModel):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     table = models.ForeignKey(Table, on_delete=models.CASCADE, related_name='attributes')
 
 
@@ -35,7 +35,7 @@ class Selection(models.Model):
 
 
 class Operator(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
 
 class Value(models.Model):
@@ -54,18 +54,19 @@ class SelectionOperator(models.Model):
 
 
 class SelectionAlgorithm(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
 
 class Projection(models.Model):
     projection = models.CharField(max_length=255)
+    alias = models.CharField(max_length=100,null=True)
     all = models.BooleanField(null=True)
     queries = models.ManyToManyField(Query)
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='projections')
 
 
 class Aggregation(models.Model):
-    function = models.CharField(max_length=255)
+    function = models.CharField(max_length=255, unique=True)
     projection = models.ForeignKey(Projection, on_delete=models.CASCADE, related_name='aggregations')
 
 
@@ -83,8 +84,8 @@ class JoinAttribute(models.Model):
 
 
 class JoinAlgorithm(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
 
 class JoinIndex(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
