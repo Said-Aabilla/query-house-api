@@ -5,8 +5,56 @@ from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 
 from .models import Query, Table, SelectionAlgorithm, Attribute, Selection, Operator, Value, SelectionOperator, \
-    Projection, Aggregation, JoinIndex, Join, JoinAttribute, JoinAlgorithm
-from .serializers import QuerySerializer
+    Projection, Aggregation, JoinIndex, Join, JoinAttribute, JoinAlgorithm,Domain
+from .serializers import QuerySerializer, ProjectionSerializer, AttributeSerializer, TableSerializer, \
+    OperatorSerializer, ValueSerializer, DomainSerializer
+
+
+class DomainCreateAPIView(generics.CreateAPIView):
+    queryset = Domain.objects.all()
+    serializer_class = DomainSerializer
+class DomainRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Domain.objects.all()
+    serializer_class = DomainSerializer
+class ValueCreateAPIView(generics.CreateAPIView):
+    queryset = Value.objects.all()
+    serializer_class = ValueSerializer
+class ValueRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Value.objects.all()
+    serializer_class = ValueSerializer
+
+class TableCreateAPIView(generics.CreateAPIView):
+    queryset = Table.objects.all()
+    serializer_class = TableSerializer
+class TableRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Table.objects.all()
+    serializer_class = TableSerializer
+class OperatorCreateAPIView(generics.CreateAPIView):
+    queryset = Operator.objects.all()
+    serializer_class = OperatorSerializer
+class OperatorRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Operator.objects.all()
+    serializer_class = OperatorSerializer
+
+class AttributeCreateAPIView(generics.CreateAPIView):
+    queryset = Attribute.objects.all()
+    serializer_class = AttributeSerializer
+
+
+class AttributeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Projection.objects.all()
+    serializer_class = AttributeSerializer
+
+
+class ProjectionCreateAPIView(generics.CreateAPIView):
+    queryset = Projection.objects.afirst()
+    serializer_class = ProjectionSerializer
+
+
+class ProjectionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Projection.objects.all()
+    serializer_class = ProjectionSerializer
+
 
 class QueryViewSet(viewsets.ModelViewSet):
     queryset = Query.objects.all()
@@ -23,7 +71,6 @@ class QueryViewSet(viewsets.ModelViewSet):
         selections_data = request.data.pop('selections')
         projections_data = request.data.pop('projections')
         joins_data = request.data.pop('joins')
-
         # create Query object
         query = Query.objects.create(**request.data)
 
@@ -47,7 +94,8 @@ class QueryViewSet(viewsets.ModelViewSet):
                 value_data = operator_data.pop('value')
                 operator = Operator.objects.create(**operator_data)
                 value = Value.objects.create(**value_data)
-                operators.append(SelectionOperator.objects.create(selection=selection_obj, operator=operator, value=value))
+                operators.append(
+                    SelectionOperator.objects.create(selection=selection_obj, operator=operator, value=value))
             selections.append(selection_obj)
         query.selections.set(selections)
 
@@ -78,7 +126,6 @@ class QueryViewSet(viewsets.ModelViewSet):
                 JoinAttribute.objects.create(join=join_obj, attribute=attribute, **join_attribute_data)
             joins.append(join_obj)
         query.joins.set(joins)
-
         serializer = QuerySerializer(query)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

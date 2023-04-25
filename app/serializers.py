@@ -1,13 +1,29 @@
 from rest_framework import serializers
-from app.models import Query, Table, Selection, Projection, Join
-
+from app.models import Query, Table, Selection, Projection, Join,Attribute,Operator,Value,Domain
 
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Table
         fields = ['id', 'name', 'alias', 'queries']
-
-
+        extra_kwargs = {
+            'queries': {'allow_empty': True},
+        }
+class AttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute
+        fields = ['id', 'name', 'table']
+class ValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Value
+        fields = ['value', 'domain']
+class DomainSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Domain
+        fields = ['domain']
+class OperatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Operator
+        fields = ['name']
 class SelectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Selection
