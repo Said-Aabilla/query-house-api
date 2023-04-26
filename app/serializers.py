@@ -4,10 +4,8 @@ from app.models import Query, Table, Selection, Projection, Join,Attribute,Opera
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Table
-        fields = ['id', 'name', 'alias', 'queries']
-        extra_kwargs = {
-            'queries': {'allow_empty': True},
-        }
+        fields = ['id', 'name', 'alias','attributes' ]
+
 class AttributeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attribute
@@ -62,3 +60,8 @@ class QuerySerializer(serializers.ModelSerializer):
         model = Query
         fields = ['id', 'query', 'join_order', 'execution_time', 'estimated_execution_time', 'execution_energy',
                   'tables', 'selections', 'projections', 'joins']
+
+class AddDatabaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Query
+        fields = ['dbname','dbuser','dbpassword','dbport']

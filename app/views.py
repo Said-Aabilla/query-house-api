@@ -1,6 +1,8 @@
 import json
 import logging
 
+from django.forms import model_to_dict
+from django.http import JsonResponse
 from django.views import View
 
 logging.basicConfig(level=logging.DEBUG)
@@ -15,13 +17,18 @@ from rest_framework.response import Response
 from .models import Query, Table, SelectionAlgorithm, Attribute, Selection, Operator, Value, SelectionOperator, \
     Projection, Aggregation, JoinIndex, Join, JoinAttribute, JoinAlgorithm, Domain
 from .serializers import ProjectionSerializer, AttributeSerializer, TableSerializer, \
-    OperatorSerializer, ValueSerializer, DomainSerializer, CreateQuerySerializer, QuerySerializer
-
-class DatabaseHandler(View):
-    def post(self,request):
-        connectionString  = "dbname"+ request.body['dbname']+ " user="+request.body['dbuser'] + " password=" + \
-                            request.body['dbpassword'] + " port=" + request.body['dbport']
-        conn = psycopg2.connect(connectionString)
+    OperatorSerializer, ValueSerializer, DomainSerializer, CreateQuerySerializer, QuerySerializer, AddDatabaseSerializer
+class DatabaseHandler(viewsets.ModelViewSet):
+    queryset = Query.objects.all()
+    serializer_class = AddDatabaseSerializer
+    def post(self, request):
+        data = json.loads(request.body)
+        conn = psycopg2.connect(
+            host=data.get("dbhost"),
+            port=data.get('dbport'),
+            database=data.get('dbname'),
+            user=data.get('dbuser'),
+            password=data.get('password'))
         cur = conn.cursor()
         cur.execute("""
             SELECT table_name, column_name, data_type
@@ -31,18 +38,25 @@ class DatabaseHandler(View):
         """)
         rows = cur.fetchall()
         result = []
+        my_dict = {}
         for row in rows:
             table_name, column_name, data_type = row
             result.append({'table_name': table_name, 'column_name': column_name, 'data_type': data_type})
-        json_result = json.dumps(result)
-        print(json_result)
-        return Response(status=201,data=json_result)
-
+        for record in result:
+            resultTable = Table.objects.filter(name=record.get('table_name'))
+            # table d'ont exist
+            if len(resultTable) == 0:
+                print(Table.objects.create(name=record.get('table_name'), alias='test'))
+            if len(resultTable) > 0:
+                if len(Attribute.objects.filter(name=record.get('column_name'),table_id=resultTable[0].id))==0:
+                    Attribute.objects.create(name=record.get('column_name'),table_id=resultTable[0].id)
+        querySet = Table.objects.prefetch_related('attributes').all()
+        serializer = TableSerializer(querySet,many=True)
+        # Return the dictionary as JSON response
+        return Response(serializer.data)
 class DomainCreateAPIView(generics.CreateAPIView):
     queryset = Domain.objects.all()
     serializer_class = DomainSerializer
-
-
 class DomainRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Domain.objects.all()
     serializer_class = DomainSerializer
@@ -143,7 +157,8 @@ class QueryViewSet(viewsets.ModelViewSet):
             aggregation = Aggregation.objects.get(function=proj['aggregation'])
 
             projection = Projection.objects.create(projection=proj['projection'], alias=proj['alias'],
-                                                   all=proj['all'], attribute_id=proj['attribute_id'], aggregation=aggregation)
+                                                   all=proj['all'], attribute_id=proj['attribute_id'],
+                                                   aggregation=aggregation)
 
         # Add the joins to the query
         for join_info in join_info:
@@ -159,4 +174,3 @@ class QueryViewSet(viewsets.ModelViewSet):
         serializer = QuerySerializer(query)
 
         return Response(serializer.data)
-

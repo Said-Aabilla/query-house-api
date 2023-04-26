@@ -25,6 +25,9 @@ class Attribute(BaseModel):
     name = models.CharField(max_length=50, unique=True)
     table = models.ForeignKey(Table, on_delete=models.CASCADE, related_name='attributes')
 
+class Alias(BaseModel):
+    name = models.CharField(max_length=50, unique=True)
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, related_name='attributes')
 
 class Selection(models.Model):
     selection = models.CharField(max_length=255)

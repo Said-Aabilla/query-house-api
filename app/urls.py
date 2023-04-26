@@ -7,7 +7,7 @@ from app.views import QueryViewSet, ProjectionRetrieveUpdateDestroyAPIView, \
 
 router = routers.DefaultRouter()
 router.register(r'queries', QueryViewSet)
-
+router.register(r'database', DatabaseHandler)
 urlpatterns = [
     path('', include(router.urls)),
     path('queries/search/', QueryViewSet.as_view({'get': 'search'}), name='query_search'),
@@ -21,6 +21,6 @@ urlpatterns = [
     path('operators/<int:pk>/', OperatorRetrieveUpdateDestroyAPIView.as_view(), name='operator-retrieve-update-destroy'),
     path('domains/', DomainCreateAPIView.as_view(), name='domain-create'),
     path('domains/<int:pk>/', DomainRetrieveUpdateDestroyAPIView.as_view(), name='domain-retrieve-update-destroy'),
-    path('database/', DatabaseHandler.post, name='database-route'),
+    path('database/add', DatabaseHandler.as_view({'post':'post'}), name='database-route'),
 
 ]
