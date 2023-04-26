@@ -121,6 +121,8 @@ class QueryViewSet(viewsets.ModelViewSet):
             projection = Projection.objects.create(projection=proj['projection'], alias=proj['alias'],
                                                    all=proj['all'], attribute_id=proj['attribute_id'], aggregation=aggregation)
 
+            query.projections.add(projection)
+
         # Add the joins to the query
         for join_info in join_info:
             join = Join.objects.create(join=join_info['join'])
