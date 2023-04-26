@@ -9,20 +9,42 @@ logging.basicConfig(level=logging.DEBUG)
 import psycopg2
 import json
 from django.shortcuts import render
-
+from django.shortcuts import get_object_or_404
 # Create your views here.
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
-
+def get_attribute(request, table_id, attribute_name):
+    table = get_object_or_404(Table, id=table_id)
+    attribute = get_object_or_404(Attribute, name=attribute_name, table=table)
+    data = {
+        'name': attribute.name,
+        'table': attribute.table.id,
+        'attribute_id': attribute.id
+    }
+    return JsonResponse(data)
+def get_table(request, table_name, ):
+    print('lign 26')
+    table = get_object_or_404(Table,name=table_name)
+    data = {
+        'table_id': table.id,
+        'table_name': table_name,
+    }
+    return JsonResponse(data)
 from .models import Query, Table, SelectionAlgorithm, Attribute, Selection, Operator, Value, SelectionOperator, \
-    Projection, Aggregation, JoinIndex, Join, JoinAttribute, JoinAlgorithm, Domain
+    Projection, Aggregation, JoinIndex, Join, JoinAttribute, JoinAlgorithm, Domain,Alias
 from .serializers import ProjectionSerializer, AttributeSerializer, TableSerializer, \
     OperatorSerializer, ValueSerializer, DomainSerializer, CreateQuerySerializer, QuerySerializer, AddDatabaseSerializer
 class DatabaseHandler(viewsets.ModelViewSet):
     queryset = Query.objects.all()
     serializer_class = AddDatabaseSerializer
+
     def post(self, request):
         data = json.loads(request.body)
+        joinAlgorithms = data.get('joinAlgorithms')
+        aggreations = data.get('aggreations')
+        operations = data.get('operations')
+        selectionAlgorithms= data.get('selectionAlgorithms')
+
         conn = psycopg2.connect(
             host=data.get("dbhost"),
             port=data.get('dbport'),
@@ -38,6 +60,7 @@ class DatabaseHandler(viewsets.ModelViewSet):
         """)
         rows = cur.fetchall()
         result = []
+        aliases_dict = data.get('aliases')
         my_dict = {}
         for row in rows:
             table_name, column_name, data_type = row
@@ -46,11 +69,26 @@ class DatabaseHandler(viewsets.ModelViewSet):
             resultTable = Table.objects.filter(name=record.get('table_name'))
             # table d'ont exist
             if len(resultTable) == 0:
-                print(Table.objects.create(name=record.get('table_name'), alias='test'))
+                resultInsertionTable = Table.objects.create(name=record.get('table_name'),)
+                list_aliases = aliases_dict.get(record.get('table_name'))
+                for alias  in list_aliases:
+                    Alias.objects.create(name=alias,table_id=resultInsertionTable.id)
             if len(resultTable) > 0:
                 if len(Attribute.objects.filter(name=record.get('column_name'),table_id=resultTable[0].id))==0:
                     Attribute.objects.create(name=record.get('column_name'),table_id=resultTable[0].id)
         querySet = Table.objects.prefetch_related('attributes').all()
+        for join in joinAlgorithms:
+            if len(JoinAlgorithm.objects.filter(name=join)) == 0:
+                JoinAlgorithm.objects.create(name=join)
+        for operation in operations:
+            if len(Operator.objects.filter(name=operation)) == 0:
+                Operator.objects.create(name=operation)
+        for aggreation in aggreations:
+            if len( Aggregation.objects.filter(function=aggreation)) == 0:
+                Aggregation.objects.create(function=aggreation)
+        for selectionAlgorithm in selectionAlgorithms:
+            if len(SelectionAlgorithm.objects.filter(name=selectionAlgorithm)) == 0:
+                SelectionAlgorithm.objects.create(name=selectionAlgorithm)
         serializer = TableSerializer(querySet,many=True)
         # Return the dictionary as JSON response
         return Response(serializer.data)

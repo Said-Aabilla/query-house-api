@@ -4,7 +4,7 @@ from app.models import Query, Table, Selection, Projection, Join,Attribute,Opera
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Table
-        fields = ['id', 'name', 'alias','attributes' ]
+        fields = ['id', 'name','attributes' ]
 
 class AttributeSerializer(serializers.ModelSerializer):
     class Meta:
