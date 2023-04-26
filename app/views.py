@@ -1,7 +1,11 @@
 import json
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
+from django.views import View
+
+logging.basicConfig(level=logging.DEBUG)
+import psycopg2
+import json
 from django.shortcuts import render
 
 # Create your views here.
@@ -13,6 +17,26 @@ from .models import Query, Table, SelectionAlgorithm, Attribute, Selection, Oper
 from .serializers import ProjectionSerializer, AttributeSerializer, TableSerializer, \
     OperatorSerializer, ValueSerializer, DomainSerializer, CreateQuerySerializer, QuerySerializer
 
+class DatabaseHandler(View):
+    def post(self,request):
+        connectionString  = "dbname"+ request.body['dbname']+ " user="+request.body['dbuser'] + " password=" + \
+                            request.body['dbpassword'] + " port=" + request.body['dbport']
+        conn = psycopg2.connect(connectionString)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT table_name, column_name, data_type
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+            ORDER BY table_name, ordinal_position;
+        """)
+        rows = cur.fetchall()
+        result = []
+        for row in rows:
+            table_name, column_name, data_type = row
+            result.append({'table_name': table_name, 'column_name': column_name, 'data_type': data_type})
+        json_result = json.dumps(result)
+        print(json_result)
+        return Response(status=201,data=json_result)
 
 class DomainCreateAPIView(generics.CreateAPIView):
     queryset = Domain.objects.all()

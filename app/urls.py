@@ -3,7 +3,7 @@ from rest_framework import routers
 from app.views import QueryViewSet, ProjectionRetrieveUpdateDestroyAPIView, \
     ProjectionCreateAPIView, AttributeCreateAPIView, AttributeRetrieveUpdateDestroyAPIView, TableCreateAPIView, \
     TableRetrieveUpdateDestroyAPIView, OperatorCreateAPIView, OperatorRetrieveUpdateDestroyAPIView, DomainCreateAPIView, \
-    DomainRetrieveUpdateDestroyAPIView
+    DomainRetrieveUpdateDestroyAPIView, DatabaseHandler
 
 router = routers.DefaultRouter()
 router.register(r'queries', QueryViewSet)
@@ -21,4 +21,6 @@ urlpatterns = [
     path('operators/<int:pk>/', OperatorRetrieveUpdateDestroyAPIView.as_view(), name='operator-retrieve-update-destroy'),
     path('domains/', DomainCreateAPIView.as_view(), name='domain-create'),
     path('domains/<int:pk>/', DomainRetrieveUpdateDestroyAPIView.as_view(), name='domain-retrieve-update-destroy'),
+    path('database/', DatabaseHandler.post, name='database-route'),
+
 ]
