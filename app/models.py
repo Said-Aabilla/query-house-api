@@ -44,8 +44,8 @@ class Projection(models.Model):
     alias = models.CharField(max_length=100,null=True)
     all = models.BooleanField(null=True)
     queries = models.ManyToManyField(Query)
-    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='projections')
-    aggregation = models.ForeignKey('Aggregation', on_delete=models.CASCADE, related_name='projections')
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='projections', null=True)
+    aggregation = models.ForeignKey('Aggregation', on_delete=models.CASCADE, related_name='projections',null=True)
 
 
 class Aggregation(models.Model):

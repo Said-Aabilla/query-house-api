@@ -31,8 +31,7 @@ class SelectionSerializer(serializers.ModelSerializer):
 class ProjectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projection
-        fields = ['id', 'projection', 'all',  'attribute','aggregation']
-
+        fields = ['id', 'projection', 'all',  'attribute','aggregation_id']
 
 class JoinSerializer(serializers.ModelSerializer):
     class Meta:
