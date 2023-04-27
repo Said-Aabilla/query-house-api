@@ -1,27 +1,19 @@
 from django.urls import include, path
 from rest_framework import routers
-from app.views import QueryViewSet, ProjectionRetrieveUpdateDestroyAPIView, \
-    ProjectionCreateAPIView, AttributeCreateAPIView, AttributeRetrieveUpdateDestroyAPIView, TableCreateAPIView, \
-    TableRetrieveUpdateDestroyAPIView, OperatorCreateAPIView, OperatorRetrieveUpdateDestroyAPIView, DomainCreateAPIView, \
-    DomainRetrieveUpdateDestroyAPIView, DatabaseHandler,get_attribute,get_table
+
+from app.views.DatabaseHandlerView import DatabaseHandlerView
+from app.views.QueryViewSet import QueryViewSet
+from app.views.views import  findAttributeByNameAndTable,findTableByName
 
 router = routers.DefaultRouter()
 router.register(r'queries', QueryViewSet)
-router.register(r'database', DatabaseHandler)
+router.register(r'database', DatabaseHandlerView)
 urlpatterns = [
     path('', include(router.urls)),
+    path('database/add', DatabaseHandlerView.as_view({'post': 'post'}), name='database-route'),
     path('queries/search/', QueryViewSet.as_view({'get': 'search'}), name='query_search'),
-    path('projections/', ProjectionCreateAPIView.as_view(), name='projection-create'),
-    path('projections/<int:pk>/', ProjectionRetrieveUpdateDestroyAPIView.as_view(), name='projection-retrieve-update-destroy'),
-    path('attributes/', AttributeCreateAPIView.as_view(), name='attribute-create'),
-    path('attributes/<int:pk>/', AttributeRetrieveUpdateDestroyAPIView.as_view(), name='attribute-retrieve-update-destroy'),
-    path('tables/', TableCreateAPIView.as_view(), name='table-create'),
-    path('operators/', OperatorCreateAPIView.as_view(), name='operator-create'),
-    path('operators/<int:pk>/', OperatorRetrieveUpdateDestroyAPIView.as_view(), name='operator-retrieve-update-destroy'),
-    path('domains/', DomainCreateAPIView.as_view(), name='domain-create'),
-    path('domains/<int:pk>/', DomainRetrieveUpdateDestroyAPIView.as_view(), name='domain-retrieve-update-destroy'),
-    path('database/add', DatabaseHandler.as_view({'post':'post'}), name='database-route'),
-    path('tables/<str:table_name>/', get_table, name='get_table'),
-    path('tables/<int:table_id>/attributes/<str:attribute_name>/', get_attribute, name='get_attribute'),
+    path('queries/updateJoinOrder', QueryViewSet.as_view({'put': 'updateJoinOrder'}), name='updateJoinOrder'),
+    path('tables/<str:table_name>/', findTableByName, name='get_table'),
+    path('tables/<int:table_name>/attributes/<str:attribute_name>/', findAttributeByNameAndTable, name='get_attribute'),
 
 ]
