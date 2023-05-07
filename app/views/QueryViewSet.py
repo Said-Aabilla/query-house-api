@@ -1,6 +1,7 @@
 import json
 
 from django.shortcuts import get_object_or_404
+from django.template.defaultfilters import upper
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -50,7 +51,7 @@ class QueryViewSet(viewsets.ModelViewSet):
         for proj in projection_info:
             # Add the aggregation to the projection
 
-            aggregation = Aggregation.objects.get(function=proj['aggregation'])
+            aggregation = Aggregation.objects.get(function=upper(proj['aggregation']))
 
             projection = Projection.objects.create(projection=proj['projection'], alias=proj['alias'],
                                                    all=proj['all'], attribute_id=proj['attribute_id'],
