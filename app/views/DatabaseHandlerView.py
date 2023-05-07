@@ -44,7 +44,7 @@ class DatabaseHandlerView(viewsets.ModelViewSet):
             resultTable = Table.objects.filter(name=record.get('table_name'))
             # table d'ont exist
             if len(resultTable) == 0:
-                resultInsertionTable = Table.objects.create(name=record.get('table_name'), )
+                resultInsertionTable = Table.objects.create(name=record.get('table_name'))
                 list_aliases = aliases_dict.get(record.get('table_name'))
                 Attribute.objects.create(name=record.get('column_name'), table_id=resultInsertionTable.id)
                 for alias in list_aliases:

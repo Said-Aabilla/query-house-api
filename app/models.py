@@ -3,9 +3,14 @@ from django.db import models
 from app.models_base import BaseModel
 class Query(BaseModel):
     query = models.TextField()
+    prefix = models.CharField(max_length=250, null=True)
     join_order = models.CharField(max_length=250, null=True)
-    execution_time = models.FloatField(null=True)
-    estimated_execution_time = models.FloatField(null=True)
+    choosed_plan = models.CharField(max_length=100, null=True)
+    join_order2 = models.CharField(max_length=250, null=True)
+    execution_time_hybride = models.FloatField(null=True)
+    execution_time_pg = models.FloatField(null=True)
+    estimated_execution_time1 = models.FloatField(null=True)
+    estimated_execution_time2 = models.TextField(null=True)
     execution_energy = models.FloatField(null=True)
     tables = models.ManyToManyField('Table')
     selections = models.ManyToManyField('Selection')
@@ -46,28 +51,18 @@ class Projection(models.Model):
     queries = models.ManyToManyField(Query)
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='projections', null=True)
     aggregation = models.ForeignKey('Aggregation', on_delete=models.CASCADE, related_name='projections',null=True)
-
-
 class Aggregation(models.Model):
     function = models.CharField(max_length=255, unique=True)
-
-
 class Join(models.Model):
     join = models.CharField(max_length=255)
     index = models.ForeignKey('JoinIndex', on_delete=models.CASCADE, related_name='joins', null=True)
     algorithm = models.ForeignKey('JoinAlgorithm', on_delete=models.CASCADE, related_name='joins', null=True)
     queries = models.ManyToManyField(Query)
-
-
 class JoinAttribute(models.Model):
     join = models.ForeignKey(Join, on_delete=models.CASCADE)
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE)
     position = models.CharField(max_length=20)
-
-
 class JoinAlgorithm(models.Model):
     name = models.CharField(max_length=255, unique=True)
-
-
 class JoinIndex(models.Model):
     name = models.CharField(max_length=255, unique=True)
