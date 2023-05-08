@@ -76,14 +76,14 @@ WSGI_APPLICATION = 'query_house_api.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'query_house',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '5401',
-    }
+'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'query_house',
+    'USER': 'f.djellali',
+    'PASSWORD': 'o9HkSzOqjf5A',
+    'HOST': 'ep-snowy-hill-307394-pooler.us-east-2.aws.neon.tech',
+    'PORT': '5432',
+  }
 }
 
 
