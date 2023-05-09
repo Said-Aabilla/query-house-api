@@ -79,14 +79,12 @@ DATABASES = {
 'default': {
     'ENGINE': 'django.db.backends.postgresql',
     'NAME': 'query_house',
-    'USER': 'f.djellali',
-    'PASSWORD': 'o9HkSzOqjf5A',
-    'HOST': 'ep-snowy-hill-307394-pooler.us-east-2.aws.neon.tech',
-    'PORT': '5432',
+    'USER': 'postgres',
+    'PASSWORD': '',
+    'HOST': 'localhost',
+    'PORT': '5401',
   }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

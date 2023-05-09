@@ -2,11 +2,15 @@ from django.db import models
 
 from app.models_base import BaseModel
 class Query(BaseModel):
+    number_join = models.FloatField(null=True)
     query = models.TextField()
     prefix = models.CharField(max_length=250, null=True)
     join_order = models.CharField(max_length=250, null=True)
     choosed_plan = models.CharField(max_length=100, null=True)
     join_order2 = models.CharField(max_length=250, null=True)
+    prefix_algo = models.CharField(max_length=250, null=True)
+    prefix_search_time = models.FloatField(null=True)
+    prefix_search_energy = models.FloatField(null=True)
     execution_time_hybride = models.FloatField(null=True)
     execution_time_pg = models.FloatField(null=True)
     estimated_execution_time1 = models.FloatField(null=True)

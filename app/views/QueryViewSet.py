@@ -29,12 +29,18 @@ class QueryViewSet(viewsets.ModelViewSet):
         join_order1 = data.get('join_order1')
         join_order2 = data.get('join_order2')
         choosed_plan = data.get('choosed_plan')
+        number_join = data.get('number_join')
+        prefix_algo = data.get('prefix_algo')
+        prefix_search_time = data.get('prefix_search_time')
         prefix = data.get('prefix')
         # Create the Query object
         query = Query.objects.create(query=query_str,
+                                     number_join= number_join,
                                      execution_time_hybride=execution_time_hybride,
                                      execution_time_pg=execution_time_pg,
                                      execution_energy=0,
+                                     prefix_algo=prefix_algo,
+                                     prefix_search_time=prefix_search_time,
                                      join_order=join_order1,
                                      join_order2=join_order2,
                                      choosed_plan=choosed_plan,
