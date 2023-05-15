@@ -9,7 +9,7 @@ from app.models import Query, Table, Selection, Operator, Value, Aggregation, Pr
 from app.serializers import CreateQuerySerializer, QuerySerializer
 class QueryViewSet(viewsets.ModelViewSet):
     queryset = Query.objects.all()
-    serializer_class = CreateQuerySerializer
+    serializer_class = QuerySerializer
     def search(self, request):
         keyword = request.GET.get('keyword')
         queries = Query.objects.filter(query__icontains=keyword)
@@ -24,35 +24,44 @@ class QueryViewSet(viewsets.ModelViewSet):
         join_info = data.get('join', [])
         execution_time_hybride = data.get('execution_time_hybride')
         execution_time_pg = data.get('execution_time_pg')
-        estimated_execution_time1 = data.get('estimated_execution_time1')
-        estimated_execution_time2 = data.get('estimated_execution_time2')
-        join_order1 = data.get('join_order1')
-        join_order2 = data.get('join_order2')
+
+        join_order_pg = data.get('join_order_pg')
+        converge = data.get('converge')
+        join_order_hinter = data.get('join_order_hinter')
         choosed_plan = data.get('choosed_plan')
         number_join = data.get('number_join')
         prefix_algo = data.get('prefix_algo')
-        prefix_search_time = data.get('prefix_search_time')
+        execution_energy_hybrid = data.get('execution_energy_hybrid')
+        json_plan_pg = data.get('json_plan_pg')
+        json_plan_hinter= data.get('json_plan_hybride')
+        execution_energy_pg = data.get('execution_energy_pg')
+        json_plan_hinter_real = data.get('json_plan_hinter_real')
+        json_plan_pg_real = data.get('json_plan_pg_real')
         prefix = data.get('prefix')
         # Create the Query object
         query = Query.objects.create(query=query_str,
+                                     json_plan_hinter_real = json_plan_hinter_real,
+                                     json_plan_pg_real= json_plan_pg_real,
+                                     json_plan_hinter = json_plan_hinter,
+                                     json_plan_pg = json_plan_pg,
                                      number_join= number_join,
                                      execution_time_hybride=execution_time_hybride,
                                      execution_time_pg=execution_time_pg,
-                                     execution_energy=0,
+                                     converge = converge,
                                      prefix_algo=prefix_algo,
-                                     prefix_search_time=prefix_search_time,
-                                     join_order=join_order1,
-                                     join_order2=join_order2,
+                                     execution_energy_hybrid=execution_energy_hybrid,
+                                     execution_energy_pg=execution_energy_pg,
+                                     join_order_pg=join_order_pg,
+                                     join_order_hinter=join_order_hinter,
                                      choosed_plan=choosed_plan,
-                                     prefix=prefix,
-                                     estimated_execution_time1=estimated_execution_time1,
-                                     estimated_execution_time2=estimated_execution_time2)
+
+        prefix=prefix,
+                                )
         # Add the tables to the query
         for table_id in table_ids:
             table = Table.objects.get(id=table_id)
             query.tables.add(table)
         # Add the selections to the query
-
         for sel in selection_info:
             selection = Selection.objects.create(selection=sel['selection'], attribute_id=sel['attribute_id'])
             query.selections.add(selection)
@@ -93,7 +102,6 @@ class QueryViewSet(viewsets.ModelViewSet):
                 return Response({'error': 'Query object not found.'}, status=404)
         except ValueError:
             return Response({'error': 'Invalid query ID.'}, status=400)
-
         # Verify the join order is not empty
         if not join_order:
             return Response({'error': 'Join order cannot be empty.'}, status=400)

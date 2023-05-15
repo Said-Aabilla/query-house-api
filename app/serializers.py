@@ -37,28 +37,38 @@ class JoinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Join
         fields = ['id', 'join', 'index', 'algorithm']
-
-
 class CreateQuerySerializer(serializers.ModelSerializer):
     tables = TableSerializer(many=True, read_only=True)
     selections = SelectionSerializer(many=True, read_only=True)
     projections = ProjectionSerializer(many=True, read_only=True)
     joins = JoinSerializer(many=True, read_only=True)
-
     class Meta:
         model = Query
         fields = ['query', 'tables', 'selections', 'projections', 'joins']
-
 class QuerySerializer(serializers.ModelSerializer):
     tables = TableSerializer(many=True, read_only=True)
     selections = SelectionSerializer(many=True, read_only=True)
     projections = ProjectionSerializer(many=True, read_only=True)
     joins = JoinSerializer(many=True, read_only=True)
-
     class Meta:
         model = Query
-        fields = ['id', 'query', 'join_order', 'execution_time', 'estimated_execution_time', 'execution_energy',
-                  'tables', 'selections', 'projections', 'joins']
+        fields = ['id', 'query',
+                  'number_join',
+        'json_plan_pg_real' ,
+        'json_plan_hinter_real',
+        'json_plan_pg',
+        'json_plan_hinter',
+       'converge',
+       'prefix',
+        'join_order_pg',
+        'choosed_plan',
+        'join_order_hinter',
+        'prefix_algo',
+        'execution_time_hybride',
+        'execution_time_pg',
+        'execution_energy_pg',
+        'execution_energy_hybrid',
+        'tables', 'selections', 'projections', 'joins']
 
 class AddDatabaseSerializer(serializers.ModelSerializer):
     class Meta:
