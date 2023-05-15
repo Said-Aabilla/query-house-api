@@ -57,7 +57,7 @@ class QuerySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Query
-        fields = ['id', 'query', 'join_order', 'execution_time', 'estimated_execution_time', 'execution_energy',
+        fields = ['id', 'query', 'join_order',
                   'tables', 'selections', 'projections', 'joins']
 
 class AddDatabaseSerializer(serializers.ModelSerializer):
