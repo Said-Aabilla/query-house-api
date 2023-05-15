@@ -10,7 +10,7 @@ from app.models import Query, Table, Selection, Operator, Value, Aggregation, Pr
 from app.serializers import CreateQuerySerializer, QuerySerializer
 class QueryViewSet(viewsets.ModelViewSet):
     queryset = Query.objects.all()
-    serializer_class = CreateQuerySerializer
+    serializer_class = QuerySerializer
     def search(self, request):
         keyword = request.GET.get('keyword')
         queries = Query.objects.filter(query__icontains=keyword)
@@ -23,25 +23,9 @@ class QueryViewSet(viewsets.ModelViewSet):
         selection_info = data.get('selection', [])
         projection_info = data.get('projection', [])
         join_info = data.get('join', [])
-        execution_time_hybride = data.get('execution_time_hybride', None)
-        execution_time_pg = data.get('execution_time_pg',None)
-        estimated_execution_time1 = data.get('estimated_execution_time1',None)
-        estimated_execution_time2 = data.get('estimated_execution_time2',None)
-        join_order = data.get('join_order',None)
-        join_order2 = data.get('join_order2',None)
-        choosed_plan = data.get('choosed_plan',None)
-        prefix = data.get('prefix',None)
+
         # Create the Query object
-        query = Query.objects.create(query=query_str,
-                                     execution_time_hybride=execution_time_hybride,
-                                     execution_time_pg=execution_time_pg,
-                                     execution_energy=0,
-                                     join_order=join_order,
-                                     join_order2=join_order2,
-                                     choosed_plan=choosed_plan,
-                                     prefix=prefix,
-                                     estimated_execution_time1=estimated_execution_time1,
-                                     estimated_execution_time2=estimated_execution_time2)
+        query = Query.objects.create(query=query_str,)
         # Add the tables to the query
         for table_id in table_ids:
             table = Table.objects.get(id=table_id)
