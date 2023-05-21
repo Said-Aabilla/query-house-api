@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'query_house_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'query_house',
+        'NAME': 'query_house_1',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',

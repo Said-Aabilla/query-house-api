@@ -38,7 +38,7 @@ class QueryViewSet(viewsets.ModelViewSet):
             # Add the operators and values to the selection
             for op_info in sel['operators']:
                 print(op_info)
-                operator = Operator.objects.get(name=op_info['operator'])
+                operator = Operator.objects.get(name=upper(op_info['operator']))
                 value = Value.objects.create(value=op_info['value'], domain_id=op_info['domain_id'])
                 selection.operators.add(operator, through_defaults={'value': value})
         # Add the projections to the query
