@@ -16,6 +16,8 @@ class Query(BaseModel):
     prefix_algo = models.CharField(max_length=250, null=True)
     execution_time_hybride = models.FloatField(null=True)
     execution_time_pg = models.FloatField(null=True)
+    execution_time = models.FloatField(null=True)
+    execution_energy = models.FloatField(null=True)
     execution_energy_pg = models.FloatField(null=True)
     execution_energy_hybrid = models.FloatField(null=True)
     tables = models.ManyToManyField('Table')
@@ -34,6 +36,8 @@ class Alias(BaseModel):
 class Selection(models.Model):
     selection = models.CharField(max_length=255)
     queries = models.ManyToManyField(Query)
+    sf = models.FloatField(null=True)
+    attr = models.TextField(null=True)
     algorithm = models.ForeignKey('SelectionAlgorithm', on_delete=models.CASCADE, related_name='selections', null=True)
     operators = models.ManyToManyField('Operator', through='SelectionOperator')
     attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='selections')

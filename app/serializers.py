@@ -25,7 +25,9 @@ class OperatorSerializer(serializers.ModelSerializer):
 class SelectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Selection
-        fields = ['id', 'selection', 'algorithm', 'operators', 'attribute']
+        fields = [
+
+            'id', 'selection', 'algorithm', 'operators', 'attribute','sf','attr']
 
 
 class ProjectionSerializer(serializers.ModelSerializer):
@@ -54,10 +56,7 @@ class QuerySerializer(serializers.ModelSerializer):
         model = Query
         fields = ['id', 'query',
                   'number_join',
-        'json_plan_pg_real' ,
-        'json_plan_hinter_real',
-        'json_plan_pg',
-        'json_plan_hinter',
+
        'converge',
        'prefix',
         'join_order_pg',

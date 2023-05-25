@@ -4,15 +4,15 @@ from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import upper
 from rest_framework import viewsets
 from rest_framework.response import Response
-
 from app.models import Query, Table, Selection, Operator, Value, Aggregation, Projection, Join, Attribute, JoinAttribute
 from app.serializers import CreateQuerySerializer, QuerySerializer
+
 class QueryViewSet(viewsets.ModelViewSet):
     queryset = Query.objects.all()
     serializer_class = QuerySerializer
     def search(self, request):
         keyword = request.GET.get('keyword')
-        queries = Query.objects.filter(query__icontains=keyword)
+        queries = Query.objects.filter(number_join=6)
         serializer = QuerySerializer(queries, many=True)
         return Response(serializer.data)
     def create(self, request, *args, **kwargs):
@@ -24,7 +24,8 @@ class QueryViewSet(viewsets.ModelViewSet):
         join_info = data.get('join', [])
         execution_time_hybride = data.get('execution_time_hybride')
         execution_time_pg = data.get('execution_time_pg')
-
+        execution_time = data.get('execution_time')
+        execution_energy = data.get('execution_energy')
         join_order_pg = data.get('join_order_pg')
         converge = data.get('converge')
         join_order_hinter = data.get('join_order_hinter')
@@ -40,6 +41,8 @@ class QueryViewSet(viewsets.ModelViewSet):
         prefix = data.get('prefix')
         # Create the Query object
         query = Query.objects.create(query=query_str,
+                                     execution_time= execution_time,
+                                     execution_energy= execution_energy,
                                      json_plan_hinter_real = json_plan_hinter_real,
                                      json_plan_pg_real= json_plan_pg_real,
                                      json_plan_hinter = json_plan_hinter,
@@ -63,7 +66,9 @@ class QueryViewSet(viewsets.ModelViewSet):
             query.tables.add(table)
         # Add the selections to the query
         for sel in selection_info:
-            selection = Selection.objects.create(selection=sel['selection'], attribute_id=sel['attribute_id'])
+            selection = Selection.objects.create(
+                sf= sel['sf'], attr = sel['attr'],
+                selection=sel['selection'], attribute_id=sel['attribute_id'])
             query.selections.add(selection)
             # Add the operators and values to the selection
             for op_info in sel['operators']:

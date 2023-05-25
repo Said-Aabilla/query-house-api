@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/json5"></script> <!-- Include JSON5 library -->
+</head>
+<body>
+<h1>Temps d'exécution moyen des requêtes groupé par projection </h1>
+    <canvas id="chart"></canvas>
+<h1>temps d'exécution moyen des requêtes groupé par sélection </h1>
+    <canvas id="chart2"></canvas>
+<h1>Énergie moyenne consommée des requêtes grouper par projection </h1>
+    <canvas id="chart3"></canvas>
+<h1>Énergie moyenne consommée des requêtes grouper par sélection </h1>
+
+    <canvas id="chart4"></canvas>
+<h1>Temps d'exécution moyen des requêtes groupé par nombre de jointure </h1>
+     <canvas id="chart5"></canvas>
+    <script>
+        // Assuming you have the 'result' variable passed from the view
+        // Extracting the projection names and average execution times from the result
+        const labels = JSON.parse('{{ resultSAP|safe }}').map(item => item['projections__projection']);
+        const dataSAP = JSON.parse('{{ resultSAP|safe }}').map(item => item['avg_execution_time']);
+        const dataMCTSP = JSON.parse('{{ resultMCTSP|safe }}').map(item => item['avg_execution_time']);
+        const dataRTOSP = JSON.parse('{{ resultRTOSP|safe }}').map(item => item['avg_execution_time']);
+        const dataIIP = JSON.parse('{{ resultIIP|safe }}').map(item => item['avg_execution_time']);
+        const dataMINSELP = JSON.parse('{{ resultMINSELP|safe }}').map(item => item['avg_execution_time']);
+        // Creating a bar chart using Chart.js
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                options: {
+                plugins: {
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'xy'
+                        },
+                        pan: {
+                            enabled: true,
+                            mode: 'xy'
+                        }
+                    }
+                }
+            },
+
+                datasets: [{
+                    label: 'SA',
+                    data: dataSAP,
+                    backgroundColor: 'red', // Customize the bar color
+                },
+                {
+                    label: 'MCTS',
+                    data: dataMCTSP,
+                    backgroundColor: 'blue', // Customize the bar color
+                },
+                {
+                    label: 'II',
+                    data: dataIIP,
+                    backgroundColor: 'green', // Customize the bar color
+                },{
+                    label: 'MINSEL',
+                    data: dataMINSELP,
+                    backgroundColor: 'black', // Customize the bar color
+                },
+                {
+                    label: 'RTOS',
+                    data: dataMINSELP,
+                    backgroundColor: 'yellow', // Customize the bar color
+                }
+                ]
+
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        // Add any additional y-axis customization if needed
+                    }
+                }
+            }
+        });
+        /* part 2*/
+        const labels2 = JSON.parse('{{ resultSAS|safe }}').map(item => item['selections__selection']);
+        const dataSAS = JSON.parse('{{ resultSAS|safe }}').map(item => item['avg_execution_time']);
+        const dataMCTSS = JSON.parse('{{ resultMCTSS|safe }}').map(item => item['avg_execution_time']);
+        const dataRTOSS = JSON.parse('{{ resultRTOSS|safe }}').map(item => item['avg_execution_time']);
+        const dataIIS = JSON.parse('{{ resultIIS|safe }}').map(item => item['avg_execution_time']);
+        const dataMINSELS = JSON.parse('{{ resultMINSELS|safe }}').map(item => item['avg_execution_time']);
+        // Creating a bar chart using Chart.js
+        const ctx2 = document.getElementById('chart2').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels2,
+                datasets: [{
+                    label: 'SA',
+                    data: dataSAS,
+                    backgroundColor: 'red', // Customize the bar color
+                },
+                {
+                    label: 'MCTS',
+                    data: dataMCTSS,
+                    backgroundColor: 'blue', // Customize the bar color
+                },
+                {
+                    label: 'II',
+                    data: dataIIS,
+                    backgroundColor: 'green', // Customize the bar color
+                },{
+                    label: 'MINSEL',
+                    data: dataMINSELS,
+                    backgroundColor: 'black', // Customize the bar color
+                },
+                {
+                    label: 'RTOS',
+                    data: dataMINSELS,
+                    backgroundColor: 'yellow', // Customize the bar color
+                }
+                ]
+
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        // Add any additional y-axis customization if needed
+                    }
+                }
+            }
+        });
+        /* */
+        const labelsE = JSON.parse('{{ resultSAPE|safe }}').map(item => item['projections__projection']);
+        const dataSAPE = JSON.parse('{{ resultSAPE|safe }}').map(item => item['avg_execution_time']);
+        const dataMCTSPE = JSON.parse('{{ resultMCTSPE|safe }}').map(item => item['avg_execution_time']);
+        const dataRTOSPE = JSON.parse('{{ resultRTOSPE|safe }}').map(item => item['avg_execution_time']);
+        const dataIIPE = JSON.parse('{{ resultIIPE|safe }}').map(item => item['avg_execution_time']);
+        const dataMINSELPE = JSON.parse('{{ resultMINSELPE|safe }}').map(item => item['avg_execution_time']);
+        // Creating a bar chart using Chart.js
+        const ctx3 = document.getElementById('chart3').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: labelsE,
+                options: {
+                plugins: {
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'xy'
+                        },
+                        pan: {
+                            enabled: true,
+                            mode: 'xy'
+                        }
+                    }
+                }
+            },
+
+                datasets: [{
+                    label: 'SA',
+                    data: dataSAPE,
+                    backgroundColor: 'red', // Customize the bar color
+                },
+                {
+                    label: 'MCTS',
+                    data: dataMCTSPE,
+                    backgroundColor: 'blue', // Customize the bar color
+                },
+                {
+                    label: 'II',
+                    data: dataIIPE,
+                    backgroundColor: 'green', // Customize the bar color
+                },{
+                    label: 'MINSEL',
+                    data: dataMINSELPE,
+                    backgroundColor: 'black', // Customize the bar color
+                },
+                {
+                    label: 'RTOS',
+                    data: dataMINSELPE,
+                    backgroundColor: 'yellow', // Customize the bar color
+                }
+                ]
+
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        // Add any additional y-axis customization if needed
+                    }
+                }
+            }
+        });
+         /* */
+        const labels2E = JSON.parse('{{ resultSASE|safe }}').map(item => item['selections__selection']);
+        const dataSASE = JSON.parse('{{ resultSASE|safe }}').map(item => item['avg_execution_time']);
+        const dataMCTSSE = JSON.parse('{{ resultMCTSSE|safe }}').map(item => item['avg_execution_time']);
+        const dataRTOSSE = JSON.parse('{{ resultRTOSSE|safe }}').map(item => item['avg_execution_time']);
+        const dataIISE = JSON.parse('{{ resultIISE|safe }}').map(item => item['avg_execution_time']);
+        const dataMINSELSE = JSON.parse('{{ resultMINSELS|safe }}').map(item => item['avg_execution_time']);
+        // Creating a bar chart using Chart.js
+        const ctx4 = document.getElementById('chart4').getContext('2d');
+        new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: labels2E,
+                datasets: [{
+                    label: 'SA',
+                    data: dataSASE,
+                    backgroundColor: 'red', // Customize the bar color
+                },
+                {
+                    label: 'MCTS',
+                    data: dataMCTSSE,
+                    backgroundColor: 'blue', // Customize the bar color
+                },
+                {
+                    label: 'II',
+                    data: dataIISE,
+                    backgroundColor: 'green', // Customize the bar color
+                },{
+                    label: 'MINSEL',
+                    data: dataMINSELSE,
+                    backgroundColor: 'black', // Customize the bar color
+                },
+                {
+                    label: 'RTOS',
+                    data: dataMINSELSE,
+                    backgroundColor: 'yellow', // Customize the bar color
+                }
+                ]
+
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        // Add any additional y-axis customization if needed
+                    }
+                }
+            }
+        });
+         /* */
+        const labelsJ = JSON.parse('{{ resultSAJ|safe }}').map(item => item['number_join']);
+        const dataSAJ = JSON.parse('{{ resultSAJ|safe }}').map(item => item['avg_execution_time']);
+        const dataMCTSJ = JSON.parse('{{ resultMCTSJ|safe }}').map(item => item['avg_execution_time']);
+        const dataRTOSJ = JSON.parse('{{ resultRTOSJ|safe }}').map(item => item['avg_execution_time']);
+        const dataIIJ = JSON.parse('{{ resultIIJ|safe }}').map(item => item['avg_execution_time']);
+        const dataMINSELJ = JSON.parse('{{ resultMINSELJ|safe }}').map(item => item['avg_execution_time']);
+        // Creating a bar chart using Chart.js
+        const ctx5 = document.getElementById('chart5').getContext('2d');
+        new Chart(ctx5, {
+            type: 'bar',
+            data: {
+                labels: labelsJ,
+                datasets: [{
+                    label: 'SA',
+                    data: dataSAJ,
+                    backgroundColor: 'red', // Customize the bar color
+                },
+                {
+                    label: 'MCTS',
+                    data: dataMCTSJ,
+                    backgroundColor: 'blue', // Customize the bar color
+                },
+                {
+                    label: 'II',
+                    data: dataIIJ,
+                    backgroundColor: 'green', // Customize the bar color
+                },{
+                    label: 'MINSEL',
+                    data: dataMINSELJ,
+                    backgroundColor: 'black', // Customize the bar color
+                },
+                {
+                    label: 'RTOS',
+                    data: dataRTOSJ,
+                    backgroundColor: 'yellow', // Customize the bar color
+                }
+                ]
+
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        // Add any additional y-axis customization if needed
+                    }
+                }
+            }
+        });
+
+
+    </script>
+</body>
+</html>
